@@ -334,15 +334,37 @@ if ($validator->fails()) {
             'verified' => false,
         ], 422);
     }
+$record->update([
+    'used' => true
+]);
 
-    $record->update([
-        'used' => true
-    ]);
+$response = [
+    'message'  => 'تم التحقق بنجاح',
+    'verified' => true,
+];
 
-    return response()->json([
-        'message'  => 'تم التحقق بنجاح',
-        'verified' => true,
-    ]);
+if ($request->purpose === 'phone_verification' && $record->user_id) {
+
+    User::where('id', $record->user_id)
+        ->update([
+            'phone_verified_at' => now()
+        ]);
+}
+
+if ($request->purpose === 'password_reset') {
+
+    $token = Str::random(64);
+
+    Cache::put(
+        "password_reset_otp:{$token}",
+        $request->identifier,
+        now()->addMinutes(10)
+    );
+
+    $response['reset_token'] = $token;
+}
+
+return response()->json($response);
         }
 
     // ================================================================

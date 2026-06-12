@@ -74,7 +74,7 @@ class AdminSettingsController extends Controller
      */
     public function update(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated=$request->validate([
             'platform_fee_percent'       => 'nullable|numeric|min:0|max:50',
             'booking_cancellation_hours' => 'nullable|integer|min:1|max:168',
             'max_images_per_post'        => 'nullable|integer|min:1|max:20',
@@ -87,8 +87,7 @@ class AdminSettingsController extends Controller
             'max_portfolio_images'       => 'nullable|integer|min:1|max:50',
             'featured_craftsmen_limit'   => 'nullable|integer|min:1|max:20',
         ]);
-
-        foreach ($request->validated() as $key => $value) {
+        foreach ($validated as $key => $value) {
             if ($value === null) continue;
             AdminSetting::updateOrCreate(
                 ['key'   => $key],

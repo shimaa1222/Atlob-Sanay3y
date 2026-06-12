@@ -240,7 +240,6 @@ class ServicePostController extends Controller
     public function updateResponse(Request $request, int $postId, int $responseId): JsonResponse
     {
         $request->validate(['status' => 'required|in:accepted,rejected']);
-dd($request->all());
         $post = ServicePost::where('client_id', $request->user()->id)->findOrFail($postId);
 
 

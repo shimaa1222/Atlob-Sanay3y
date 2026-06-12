@@ -6,6 +6,7 @@ use App\Http\Controllers\API\Booking\BookingController;
 use App\Http\Controllers\API\Craftsman\CraftsmanController;
 use App\Http\Controllers\API\ServicePost\ServicePostController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\AdminSettingsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Verification\VerificationController;
 use App\Http\Controllers\Api\Upload\UploadController;
@@ -25,6 +26,30 @@ use App\Http\Controllers\Api\Notification\NotificationController;
 // ============================================================
 // AUTH ROUTES - مسارات المصادقة
 // ============================================================
+
+Route::middleware('auth:sanctum')->group(function () {
+
+// ─── UPLOAD ────────────────────────────────────────────────
+    Route::prefix('upload')->group(function () {
+        Route::post('/image',    [UploadController::class, 'uploadImage']);
+        Route::post('/multiple', [UploadController::class, 'uploadMultiple']);
+        Route::post('/document', [UploadController::class, 'uploadDocument']);
+        Route::delete('/',       [UploadController::class, 'deleteFile']);
+    });
+
+    // ─── NOTIFICATIONS ──────────────────────────────────────────
+    Route::prefix('notifications')->group(function () {
+        Route::get('/',             [NotificationController::class, 'index']);//finish
+        Route::get('/count',        [NotificationController::class, 'unreadCount']);//finish
+        Route::post('/read-all',    [NotificationController::class, 'markAllAsRead']);//finish
+        Route::delete('/',          [NotificationController::class, 'clearAll']);//finish
+        Route::patch('/{id}/read',  [NotificationController::class, 'markAsRead']);//finish
+        Route::delete('/{id}',      [NotificationController::class, 'destroy']);//finish
+    });
+
+});
+
+
 
 Route::prefix('auth')->group(function () {
 
@@ -253,23 +278,7 @@ POST /api/auth/otp/verify
 */
         //
         ///////////////not test yet////////////////
-  // ─── UPLOAD ────────────────────────────────────────────────
-    Route::prefix('upload')->group(function () {
-        Route::post('/image',    [UploadController::class, 'uploadImage']);
-        Route::post('/multiple', [UploadController::class, 'uploadMultiple']);
-        Route::post('/document', [UploadController::class, 'uploadDocument']);
-        Route::delete('/',       [UploadController::class, 'deleteFile']);
-    });
 
-    // ─── NOTIFICATIONS ──────────────────────────────────────────
-    Route::prefix('notifications')->group(function () {
-        Route::get('/',             [NotificationController::class, 'index']);//finish
-        Route::get('/count',        [NotificationController::class, 'unreadCount']);//finish
-        Route::post('/read-all',    [NotificationController::class, 'markAllAsRead']);//finish
-        Route::delete('/',          [NotificationController::class, 'clearAll']);//finish
-        Route::patch('/{id}/read',  [NotificationController::class, 'markAsRead']);//finish
-        Route::delete('/{id}',      [NotificationController::class, 'destroy']);//finish
-    });
     });
 });
 
@@ -341,6 +350,28 @@ Route::middleware(["auth:sanctum","role:craftsman,admin"])->prefix('craftsman')-
         // منشورات الخدمات (الحرفي يشوفها ويرد عليها)
         Route::get('/service-posts', [ServicePostController::class, 'index']);//finish list of all service posts with pagination and search
         Route::post('/service-posts/{id}/respond', [ServicePostController::class, 'respond']);//finish الحرفي يرد على منشور خدمة معين بعرض سعر ومدة تنفيذ
+        // Site Settings
+Route::get(
+    '/settings',
+    [AdminSettingsController::class, 'index']
+);
+
+Route::put(
+    '/settings',
+    [AdminSettingsController::class, 'update']
+);
+
+// Advanced Statistics
+Route::get(
+    '/settings/stats',
+    [AdminSettingsController::class, 'advancedStats']
+);
+
+// Impersonation
+Route::post(
+    '/users/{id}/impersonate',
+    [AdminSettingsController::class, 'impersonate']
+);
     });
 
     // ==================================

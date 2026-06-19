@@ -1,57 +1,65 @@
 <?php
 
 namespace App\Models;
-
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class OtpCode extends Model
 {
     protected $fillable = [
-        'user_id',
-        'identifier',
+        'email',
         'code',
-        'type',
         'expires_at',
         'used',
         'attempts',
     ];
+
 
     protected $casts = [
         'expires_at' => 'datetime',
         'used'       => 'boolean',
     ];
 
-    // ─── Types ────────────────────────────────────────────────
-    const TYPE_EMAIL_VERIFICATION = 'email_verification';
-    const TYPE_PHONE_VERIFICATION = 'phone_verification';
-    const TYPE_PASSWORD_RESET     = 'password_reset';
-    const TYPE_LOGIN              = 'login';
-    const TYPE_REGISTER           = 'register';
 
-    // ─── Relationships ─────────────────────────────────────────
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    // ─── Helpers ───────────────────────────────────────────────
-
+    /**
+     * هل الكود انتهت صلاحيته؟
+     */
     public function isExpired(): bool
     {
         return $this->expires_at->isPast();
     }
 
-    public function isValid(): bool
-    {
-        return !$this->used && !$this->isExpired() && $this->attempts < 3;
-    }
 
     /**
-     * تنظيف الأكواد المنتهية (يُستدعى من Scheduler يومياً)
+     * هل الكود صالح للاستخدام؟
+     */
+    public function isValid(): bool
+    {
+        return !$this->used
+            && !$this->isExpired()
+            && $this->attempts < 5;
+    }
+
+
+    /**
+     * تعليم الكود كمستخدم
+     */
+    public function markAsUsed(): void
+    {
+        $this->update([
+            'used' => true
+        ]);
+    }
+
+
+    /**
+     * حذف الأكواد القديمة
      */
     public static function cleanup(): int
     {
-        return static::where('expires_at', '<', now()->subHour())->delete();
+        // return static::where('expires_at','<',now()->subHour())->delete();
+        $query = static::where('expires_at', '<', now()->subHour());
+
+return $query->delete();
     }
 }

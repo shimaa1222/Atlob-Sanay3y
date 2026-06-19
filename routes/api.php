@@ -22,7 +22,10 @@ use App\Http\Controllers\Api\Notification\NotificationController;
 | Admin Routes - مسارات الأدمن
 |
 */
-
+//حذفت
+//Route::post('/reset-password',      [VerificationController::class, 'resetPassword']);
+// Route::post('/email/verify',        [VerificationController::class, 'verifyEmail']);
+// Route::post('/email/resend',        [VerificationController::class, 'resendVerification']);
 // ============================================================
 // AUTH ROUTES - مسارات المصادقة
 // ============================================================
@@ -75,7 +78,7 @@ Route::prefix('auth')->group(function () {
 
         // إعادة تعيين كلمة المرور
     Route::post('/forgot-password',     [VerificationController::class, 'forgotPassword']);//finish
-    Route::post('/reset-password',      [VerificationController::class, 'resetPassword']);//finish
+   // Route::post('/reset-password',      [VerificationController::class, 'resetPassword']);//finish
     Route::post('/reset-password-otp',  [VerificationController::class, 'resetPasswordWithOtp']);//finish
 
 
@@ -92,8 +95,8 @@ Route::prefix('auth')->group(function () {
 
         ////not test yet///////
                // تأكيد البريد الإلكتروني
-        Route::post('/email/verify',        [VerificationController::class, 'verifyEmail']);//finish
-        Route::post('/email/resend',        [VerificationController::class, 'resendVerification']);//finish
+//Route::post('/email/verify',        [VerificationController::class, 'verifyEmail']);//finish
+     //   Route::post('/email/resend',        [VerificationController::class, 'resendVerification']);//finish
 /*# Password Reset Flow باستخدام OTP
 
 ## 1) إرسال OTP
@@ -311,7 +314,7 @@ Route::middleware('auth:sanctum')->group(function () {
  Route::middleware(["auth:sanctum","role:client,admin"])->prefix('client')->group(function () {
 /////////////////////////////////////////////her//////////////////////////////////////
         // الحجوزات
-        Route::get('/bookings', [BookingController::class, 'clientBookings']);//finish 
+        Route::get('/bookings', [BookingController::class, 'clientBookings']);//finish
         Route::post('/bookings.store', [BookingController::class, 'store']);//finish
         Route::get('/bookings.show/{id}', [BookingController::class, 'show']);//finish
         Route::delete('/bookings.cancel/{id}', [BookingController::class, 'cancel']);//finish

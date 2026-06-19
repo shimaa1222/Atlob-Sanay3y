@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Mail\CraftsmanRejectedMail;
+use Illuminate\Notifications\Notifiable;
+use App\Notifications\CraftsmanApprovedNotification;
 class Craftsman extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes,Notifiable;
 
     protected $fillable = [
         'user_id',
@@ -204,11 +206,12 @@ class Craftsman extends Model
             'approved_at' => now(),
             'approved_by' => $adminId,
         ]);
+   $this->notify(new CraftsmanApprovedNotification());
 
         // إرسال إشعار الموافقة بالإيميل (بدون كلمة المرور، لأنه هو اللي اختارها بنفسه)
-       Mail::to($this->email)
-          ->send(new CraftsmanApprovedMail($this));
-        return true;
+    //    Mail::to($this->email)
+    //      ->send(new CraftsmanApprovedMail($this));
+     return true;
     }
 
     /**
@@ -244,4 +247,8 @@ class Craftsman extends Model
             'reviews_count' => $count,
         ]);
     }
+    public function routeNotificationForMail()
+{
+    return $this->email;
+}
 }

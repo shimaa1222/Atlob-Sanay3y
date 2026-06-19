@@ -36,50 +36,50 @@ class VerificationController extends Controller
      *
      * Response 422:
      *   { "message": "الكود غير صحيح أو منتهي الصلاحية" }
-     */
-    public function verifyEmail(Request $request): JsonResponse
-    {$validator = Validator::make($request->all(), [
-        'otp' => 'required|string|size:6',
-    ], [
-        'otp.required' => 'كود التحقق مطلوب',
-        'otp.size'     => 'كود التحقق يجب أن يكون 6 أرقام',
-    ]);
+      */
+    // public function verifyEmail(Request $request): JsonResponse
+    // {$validator = Validator::make($request->all(), [
+    //     'otp' => 'required|string|size:6',
+    // ], [
+    //     'otp.required' => 'كود التحقق مطلوب',
+    //     'otp.size'     => 'كود التحقق يجب أن يكون 6 أرقام',
+    // ]);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'message' => 'فشل التحقق من البيانات',
-            'errors'  => $validator->errors(),
-        ], 422);
-    }
-        $user = $request->user();
+    // if ($validator->fails()) {
+    //     return response()->json([
+    //         'message' => 'فشل التحقق من البيانات',
+    //         'errors'  => $validator->errors(),
+    //     ], 422);
+    // }
+    //     $user = $request->user();
 
-        if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'message' => 'البريد الإلكتروني مؤكد مسبقاً',
-            ]);
-        }
+    //     if ($user->hasVerifiedEmail()) {
+    //         return response()->json([
+    //             'message' => 'البريد الإلكتروني مؤكد مسبقاً',
+    //         ]);
+    //     }
 
-        $record = OtpCode::where('user_id', $user->id)
-            ->where('type', OtpCode::TYPE_EMAIL_VERIFICATION)
-            ->where('code', $request->otp)
-            ->where('used', false)
-            ->where('expires_at', '>', now())
-            ->first();
+    //     $record = OtpCode::where('user_id', $user->id)
+    //         ->where('type', OtpCode::TYPE_EMAIL_VERIFICATION)
+    //         ->where('code', $request->otp)
+    //         ->where('used', false)
+    //         ->where('expires_at', '>', now())
+    //         ->first();
 
-        if (!$record) {
-            return response()->json([
-                'message' => 'الكود غير صحيح أو منتهي الصلاحية',
-            ], 422);
-        }
+    //     if (!$record) {
+    //         return response()->json([
+    //             'message' => 'الكود غير صحيح أو منتهي الصلاحية',
+    //         ], 422);
+    //     }
 
-        $user->markEmailAsVerified();
-        event(new Verified($user));
-        $record->update(['used' => true]);
+    //     $user->markEmailAsVerified();
+    //     event(new Verified($user));
+    //     $record->update(['used' => true]);
 
-        return response()->json([
-            'message' => 'تم تأكيد بريدك الإلكتروني بنجاح ✅',
-        ]);
-    }
+    //     return response()->json([
+    //         'message' => 'تم تأكيد بريدك الإلكتروني بنجاح ✅',
+    //     ]);
+    // }
 
     /**
      * POST /api/auth/email/resend  🔒
@@ -95,35 +95,35 @@ class VerificationController extends Controller
      * Response 429:
      *   { "message": "يرجى الانتظار دقيقة قبل إعادة الإرسال" }
      */
-    public function resendVerification(Request $request): JsonResponse
-    {
-        $user = $request->user();
+    // public function resendVerification(Request $request): JsonResponse
+    // {
+    //     $user = $request->user();
 
-        if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'message' => 'بريدك الإلكتروني مؤكد مسبقاً',
-            ], 400);
-        }
+    //     if ($user->hasVerifiedEmail()) {
+    //         return response()->json([
+    //             'message' => 'بريدك الإلكتروني مؤكد مسبقاً',
+    //         ], 400);
+    //     }
 
-        // Rate limit: مرة واحدة كل دقيقة
-        $recent = OtpCode::where('user_id', $user->id)
-            ->where('type', OtpCode::TYPE_EMAIL_VERIFICATION)
-            ->where('created_at', '>', now()->subMinute())
-            ->exists();
+    //     // Rate limit: مرة واحدة كل دقيقة
+    //     $recent = OtpCode::where('user_id', $user->id)
+    //         ->where('type', OtpCode::TYPE_EMAIL_VERIFICATION)
+    //         ->where('created_at', '>', now()->subMinute())
+    //         ->exists();
 
-        if ($recent) {
-            return response()->json([
-                'message' => 'يرجى الانتظار دقيقة قبل إعادة الإرسال',
-            ], 429);
-        }
+    //     if ($recent) {
+    //         return response()->json([
+    //             'message' => 'يرجى الانتظار دقيقة قبل إعادة الإرسال',
+    //         ], 429);
+    //     }
 
-        $this->generateAndSendOtp($user->id, $user->email, OtpCode::TYPE_EMAIL_VERIFICATION);
+    //     $this->generateAndSendOtp($user->id, $user->email, OtpCode::TYPE_EMAIL_VERIFICATION);
 
-        return response()->json([
-            'message'    => 'تم إرسال كود جديد على بريدك الإلكتروني',
-            'expires_in' => 300,
-        ]);
-    }
+    //     return response()->json([
+    //         'message'    => 'تم إرسال كود جديد على بريدك الإلكتروني',
+    //         'expires_in' => 300,
+    //     ]);
+    // }
 
     // ================================================================
     // OTP (Public — no token required)
@@ -157,80 +157,38 @@ class VerificationController extends Controller
      * Response 429:
      *   { "message": "تجاوزت الحد المسموح. يرجى الانتظار 5 دقائق." }
      */
-    public function sendOtp(Request $request): JsonResponse
-    {
-        // $request->validate([
-        //     'identifier' => 'required|string|max:255',
-        //     'type'       => 'required|in:email,phone',
-        //     'purpose'    => 'required|in:login,register,password_reset,phone_verification,email_verification',
-        // ]);
-        $validator = Validator::make($request->all(), [
-    'identifier' => 'required|string|max:255',
-    'type'       => 'required|in:email,phone',
-    'purpose'    => 'required|in:login,register,password_reset,phone_verification,email_verification,craftsman_registration',
-], [
-    'identifier.required' => 'البريد الإلكتروني أو رقم الهاتف مطلوب',
-    'type.required'       => 'نوع الإرسال مطلوب',
-    'type.in'             => 'نوع الإرسال غير صالح',
-    'purpose.required'    => 'الغرض من الكود مطلوب',
-    'purpose.in'          => 'الغرض من الكود غير صالح',
-]);
-if ($validator->fails()) {
-    return response()->json([
-        'message' => 'فشل التحقق من البيانات',
-        'errors'  => $validator->errors(),
-    ], 422);
-}
+  public function sendOtp(Request $request): JsonResponse
+{
 
-        $identifier = $request->identifier;
-        $type       = $request->type;
-        $purpose    = $request->purpose;
+    $validator = Validator::make($request->all(), [
 
-        // لو الغرض يتطلب وجود مستخدم
-        if (in_array($purpose, ['login', 'password_reset'])) {
-            $exists = $type === 'email'
-                ? User::where('email', $identifier)->exists()
-                : User::where('phone', $identifier)->exists();
+        'email' => 'required|email',
 
-            if (!$exists) {
-                return response()->json([
-                    'message' => $type === 'email'
-                        ? 'لا يوجد حساب مرتبط بهذا البريد الإلكتروني'
-                        : 'لا يوجد حساب مرتبط بهذا الرقم',
-                ], 404);
-            }
-        }
+    ]);
 
-        // Rate limit: max 3 أكواد كل 5 دقائق
-        $recentCount = OtpCode::where('identifier', $identifier)
-            ->where('type', $purpose)
-            ->where('created_at', '>', now()->subMinutes(5))
-            ->count();
 
-        if ($recentCount >= 3) {
-            return response()->json([
-                'message' => 'تجاوزت الحد المسموح. يرجى الانتظار 5 دقائق قبل المحاولة مجدداً.',
-            ], 429);
-        }
-
-        // جلب user_id لو موجود
-        $userId = $type === 'email'
-            ? User::where('email', $identifier)->value('id')
-            : User::where('phone', $identifier)->value('id');
-
-        $this->generateAndSendOtp($userId, $identifier, $purpose, $type);
-
-        // Mask identifier
-        $masked = $type === 'phone'
-            ? substr($identifier, 0, 3) . str_repeat('*', max(0, strlen($identifier) - 6)) . substr($identifier, -3)
-            : preg_replace('/(?<=.{3}).(?=.*@)/u', '*', $identifier);
+    if($validator->fails()){
 
         return response()->json([
-            'message'    => 'تم إرسال كود التحقق',
-            'expires_in' => 300,
-            'masked'     => $masked,
-        ]);
+            'message'=>'Validation Error',
+            'errors'=>$validator->errors()
+        ],422);
+
     }
+
+
+    $this->generateAndSendOtp($request->email);
+
+
+    return response()->json([
+
+        'message'=>'تم إرسال كود التحقق على البريد الإلكتروني',
+
+        'expires_in'=>300
+
+    ]);
+
+}
 
     /**
      * POST /api/auth/otp/verify
@@ -255,128 +213,83 @@ if ($validator->fails()) {
      *   { "message": "الكود غير صحيح أو منتهي الصلاحية", "verified": false }
      */
     public function verifyOtp(Request $request): JsonResponse
-    {
-        // $validate = $request->validate([
-        //     'identifier' => 'required|string',
-        //     'otp'        => 'required|string|size:6',
-        //     'purpose'    => 'required|in:login,register,password_reset,phone_verification,email_verification',
-        // ]);
-        // $record = OtpCode::where('identifier', $request->identifier)
-        //     ->where('code', $request->otp)
-        //     ->where('type', $request->purpose)
-        //     ->where('used', false)
-        //     ->where('expires_at', '>', now())
-        //     ->latest()
-        //     ->first();
+{
 
-        // if (!$record) {
-        //     // زيادة عداد المحاولات الفاشلة
-        //     OtpCode::where('identifier', $request->identifier)
-        //         ->where('type', $request->purpose)
-        //         ->where('used', false)
-        //         ->increment('attempts');
-        //     return response()->json([
-        //         'message'  => 'الكود غير صحيح أو منتهي الصلاحية',
-        //         'verified' => false,
-        //     ], 422);
-        // }
-        // $record->update(['used' => true]);
-        // $response = ['message' => 'تم التحقق بنجاح', 'verified' => true];
-        // // phone verification → نحدث المستخدم
-        // if ($request->purpose === 'phone_verification' && $record->user_id) {
-        //     User::where('id', $record->user_id)
-        //         ->update(['phone_verified_at' => now()]);
-        // }
-        // // password_reset → token مؤقت صالح 10 دقائق
-        // if ($request->purpose === 'password_reset') {
-        //     $token = Str::random(64);
-        //     Cache::put("password_reset_otp:{$token}", $request->identifier, now()->addMinutes(10));
-        //     $response['reset_token'] = $token;
-        // }
-        // return response()->json($response);
     $validator = Validator::make($request->all(), [
-        'identifier' => 'required|string|max:255',
-        'otp'        => 'required|string|size:6',
-        'purpose'    => 'required|in:login,register,password_reset,phone_verification,email_verification,craftsman_registration',
-    ], [
-        'identifier.required' => 'الإيميل أو رقم الهاتف مطلوب',
-        'otp.required'        => 'كود التحقق مطلوب',
-        'otp.size'            => 'كود التحقق يجب أن يكون 6 أرقام',
-        'purpose.required'    => 'الغرض من التحقق مطلوب',
-        'purpose.in'          => 'نوع التحقق غير صالح',
+
+        'email'=>'required|email',
+
+        'otp'=>'required|string|size:6',
+'purpose'=>'required|in:register,password_reset',
     ]);
 
-    if ($validator->fails()) {
+
+    if($validator->fails()){
+
         return response()->json([
-            'message' => 'Validation Error',
-            'errors'  => $validator->errors(),
-        ], 422);
+            'message'=>'Validation Error',
+            'errors'=>$validator->errors()
+        ],422);
+
     }
 
-    $record = OtpCode::where('identifier', $request->identifier)
-        ->where('code', $request->otp)
-        ->where('type', $request->purpose)
-        ->where('used', false)
-        ->where('expires_at', '>', now())
+
+
+    $record = OtpCode::where('email',$request->email)
+        ->where('code',$request->otp)
+        ->where('used',false)
+        ->where('expires_at','>',now())
         ->latest()
         ->first();
 
-    if (!$record) {
 
-        OtpCode::where('identifier', $request->identifier)
-            ->where('type', $request->purpose)
-            ->where('used', false)
+
+    if(!$record){
+
+        OtpCode::where('email',$request->email)
+            ->where('used',false)
             ->increment('attempts');
 
-        return response()->json([
-            'message'  => 'الكود غير صحيح أو منتهي الصلاحية',
-            'verified' => false,
-        ], 422);
-    }
-$record->update([
-    'used' => true
-]);
 
-$response = [
+        return response()->json([
+
+            'message'=>'الكود غير صحيح أو منتهي الصلاحية'
+
+        ],422);
+
+    }
+
+
+
+    $record->update([
+
+        'used'=>true
+
+    ]);
+
+
+
+  $response = [
     'message'  => 'تم التحقق بنجاح',
     'verified' => true,
 ];
 
-if ($request->purpose === 'phone_verification' && $record->user_id) {
 
-    User::where('id', $record->user_id)
-        ->update([
-            'phone_verified_at' => now()
-        ]);
-}
-
-if ($request->purpose === 'password_reset') {
+if($request->purpose === 'register'){//تأكيد البريد الإلكتروني للتسجيل
 
     $token = Str::random(64);
 
     Cache::put(
-        "password_reset_otp:{$token}",
-        $request->identifier,
-        now()->addMinutes(10)
-    );
-
-    $response['reset_token'] = $token;
-}
-if ($request->purpose === 'craftsman_registration') {
-
-    $token = Str::random(64);
-
-    Cache::put(
-        "craftsman_registration:{$token}",
-        $request->identifier,
+        "email_verification:$token",
+        $request->email,
         now()->addMinutes(30)
     );
 
-    $response['verified_token'] = $token;
+    $response['verified_token']=$token;
 }
 
 return response()->json($response);
-        }
+}
 
     // ================================================================
     // FORGOT PASSWORD + RESET PASSWORD
@@ -393,34 +306,38 @@ return response()->json($response);
      * Response 200:
      *   { "message": "إذا كان البريد مسجلاً، ستصلك تعليمات إعادة التعيين قريباً" }
      */
-    public function forgotPassword(Request $request): JsonResponse
-    {
-        // $request->validate([
-        //     'email' => 'required|email',
-        // ]);
-         $validator = Validator::make($request->all(), [
+public function forgotPassword(Request $request): JsonResponse
+{
+    $validator = Validator::make($request->all(), [
         'email' => 'required|email',
-    ], [
-        'email.required' => 'البريد الإلكتروني مطلوب',
-        'email.email'    => 'صيغة البريد الإلكتروني غير صحيحة',
     ]);
 
     if ($validator->fails()) {
         return response()->json([
-            'message' => 'فشل التحقق من البيانات',
-            'errors'  => $validator->errors(),
+            'message' => 'Validation Error',
+            'errors' => $validator->errors()
         ], 422);
     }
 
-        // Security: نعيد نفس الـ message سواء الإيميل موجود أو لا
-        if (User::where('email', $request->email)->exists()) {
-            Password::sendResetLink(['email' => $request->email]);
-        }
 
-        return response()->json([
-            'message' => 'إذا كان البريد مسجلاً، ستصلك تعليمات إعادة التعيين قريباً',
-        ]);
+    $user = User::where('email', $request->email)->first();
+
+
+    // Security: لا تكشف هل الإيميل موجود أم لا
+    if ($user) {
+
+        $this->generateAndSendOtp(
+            $request->email,
+            'password_reset'
+        );
+
     }
+
+
+    return response()->json([
+        'message' => 'إذا كان البريد مسجلاً، سيتم إرسال كود إعادة التعيين'
+    ]);
+}
 
     /**
      * POST /api/auth/reset-password
@@ -441,56 +358,56 @@ return response()->json($response);
      * Response 422:
      *   { "message": "الرابط منتهي الصلاحية أو غير صحيح." }
      */
-    public function resetPassword(Request $request): JsonResponse
-    {
-        // $request->validate([
-        //     'token'    => 'required|string',
-        //     'email'    => 'required|email',
-        //     'password' => 'required|string|min:8|confirmed',
-        // ], [
-        //     'password.confirmed' => 'كلمة المرور غير متطابقة',
-        //     'password.min'       => 'يجب أن تكون كلمة المرور 8 أحرف على الأقل',
-        // ]);
-$validator = Validator::make($request->all(), [
-    'token'    => 'required|string',
-    'email'    => 'required|email',
-    'password' => 'required|string|min:8|confirmed',
-], [
-    'token.required'       => 'التوكن مطلوب',
-    'email.required'       => 'البريد الإلكتروني مطلوب',
-    'email.email'          => 'صيغة البريد الإلكتروني غير صحيحة',
-    'password.required'    => 'كلمة المرور مطلوبة',
-    'password.min'         => 'كلمة المرور يجب ألا تقل عن 8 أحرف',
-    'password.confirmed'   => 'تأكيد كلمة المرور غير متطابق',
-]);
+//     public function resetPassword(Request $request): JsonResponse
+//     {
+//         // $request->validate([
+//         //     'token'    => 'required|string',
+//         //     'email'    => 'required|email',
+//         //     'password' => 'required|string|min:8|confirmed',
+//         // ], [
+//         //     'password.confirmed' => 'كلمة المرور غير متطابقة',
+//         //     'password.min'       => 'يجب أن تكون كلمة المرور 8 أحرف على الأقل',
+//         // ]);
+// $validator = Validator::make($request->all(), [
+//     'token'    => 'required|string',
+//     'email'    => 'required|email',
+//     'password' => 'required|string|min:8|confirmed',
+// ], [
+//     'token.required'       => 'التوكن مطلوب',
+//     'email.required'       => 'البريد الإلكتروني مطلوب',
+//     'email.email'          => 'صيغة البريد الإلكتروني غير صحيحة',
+//     'password.required'    => 'كلمة المرور مطلوبة',
+//     'password.min'         => 'كلمة المرور يجب ألا تقل عن 8 أحرف',
+//     'password.confirmed'   => 'تأكيد كلمة المرور غير متطابق',
+// ]);
 
-if ($validator->fails()) {
-    return response()->json([
-        'message' => 'فشل التحقق من البيانات',
-        'errors'  => $validator->errors(),
-    ], 422);
-}
+// if ($validator->fails()) {
+//     return response()->json([
+//         'message' => 'فشل التحقق من البيانات',
+//         'errors'  => $validator->errors(),
+//     ], 422);
+// }
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password) {
-                $user->forceFill([
-                    'password'       => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                ])->save();
-            }
-        );
+//         $status = Password::reset(
+//             $request->only('email', 'password', 'password_confirmation', 'token'),
+//             function (User $user, string $password) {
+//                 $user->forceFill([
+//                     'password'       => Hash::make($password),
+//                     'remember_token' => Str::random(60),
+//                 ])->save();
+//             }
+//         );
 
-        if ($status === Password::PASSWORD_RESET) {
-            return response()->json([
-                'message' => 'تم تغيير كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.',
-            ]);
-        }
+//         if ($status === Password::PASSWORD_RESET) {
+//             return response()->json([
+//                 'message' => 'تم تغيير كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.',
+//             ]);
+//         }
 
-        return response()->json([
-            'message' => 'الرابط منتهي الصلاحية أو غير صحيح. يرجى طلب رابط جديد.',
-        ], 422);
-    }
+//         return response()->json([
+//             'message' => 'الرابط منتهي الصلاحية أو غير صحيح. يرجى طلب رابط جديد.',
+//         ], 422);
+//     }
 
     /**
      * POST /api/auth/reset-password-otp
@@ -536,6 +453,7 @@ if ($validator->fails()) {
     ], 422);
 }
 
+        // $email = Cache::get("password_reset_otp:{$request->reset_token}");
         $email = Cache::get("password_reset_otp:{$request->reset_token}");
 
         if (!$email) {
@@ -566,36 +484,48 @@ if ($validator->fails()) {
     // PRIVATE HELPER
     // ================================================================
 
-    private function generateAndSendOtp(
-        ?int   $userId,
-        string $identifier,
-        string $purpose,
-        string $channel = 'email'
-    ): void {
-        // إلغاء الأكواد القديمة غير المستخدمة
-        OtpCode::where('identifier', $identifier)
-            ->where('type', $purpose)
-            ->where('used', false)
-            ->update(['used' => true]);
+    private function generateAndSendOtp(string $email): void
+{
 
-        // توليد كود 6 أرقام
-        $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    // إلغاء الأكواد القديمة
 
-        OtpCode::create([
-            'user_id'    => $userId,
-            'identifier' => $identifier,
-            'code'       => $code,
-            'type'       => $purpose,
-            'expires_at' => now()->addMinutes(5),
-            'used'       => false,
-            'attempts'   => 0,
+    OtpCode::where('email',$email)
+        ->where('used',false)
+        ->update([
+            'used'=>true
         ]);
 
-        if ($channel === 'email') {
-            Mail::to($identifier)->send(new OtpMail($code, $purpose));
-        } else {
-            // SMS - Unifonic / Twilio / etc.
-            // \App\Services\SmsService::send($identifier, "كود التحقق الخاص بك: {$code}");
-        }
-    }
+
+
+    $code = str_pad(
+        random_int(0,999999),
+        6,
+        '0',
+        STR_PAD_LEFT
+    );
+
+
+
+    OtpCode::create([
+
+        'email'=>$email,
+
+        'code'=>$code,
+
+        'expires_at'=>now()->addMinutes(5),
+
+        'used'=>false,
+
+        'attempts'=>0,
+
+    ]);
+
+
+
+    Mail::to($email)
+        ->send(
+            new OtpMail($code)
+        );
+
+}
 }

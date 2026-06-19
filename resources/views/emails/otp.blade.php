@@ -25,14 +25,12 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f3f4f6;margin:0;paddin
         <div class="header-icon">
             @if($purpose === 'email_verification') ✉️
             @elseif($purpose === 'password_reset') 🔑
-            @elseif($purpose === 'phone_verification') 📱
             @else 🔐
             @endif
         </div>
         <h1>
             @if($purpose === 'email_verification') تأكيد البريد الإلكتروني
             @elseif($purpose === 'password_reset') إعادة تعيين كلمة المرور
-            @elseif($purpose === 'phone_verification') تأكيد رقم الجوال
             @else كود التحقق
             @endif
         </h1>
@@ -43,10 +41,8 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f3f4f6;margin:0;paddin
         <p class="text">
             @if($purpose === 'email_verification')
                 لإتمام تسجيلك في <strong>صنايعي</strong>، يرجى إدخال الكود أدناه لتأكيد بريدك الإلكتروني.
-            @elseif($purpose === 'password_reset')
-                تلقينا طلباً لإعادة تعيين كلمة مرورك. استخدم الكود أدناه لإتمام العملية.
-            @elseif($purpose === 'phone_verification')
-                لتأكيد رقم جوالك، أدخل الكود أدناه.
+
+
             @else
                 كود التحقق الخاص بك:
             @endif
@@ -63,9 +59,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f3f4f6;margin:0;paddin
             ⚠️ <strong>تحذير أمني:</strong> لا تشارك هذا الكود مع أي شخص. فريق صنايعي لن يطلب منك هذا الكود أبداً.
         </div>
 
-        @if($purpose === 'password_reset')
-            <p class="text" style="margin-top:18px;font-size:.83rem;color:#6b7280;">
-                إذا لم تطلب إعادة تعيين كلمة المرور، يمكنك تجاهل هذا البريد بأمان.
+
             </p>
         @endif
     </div>

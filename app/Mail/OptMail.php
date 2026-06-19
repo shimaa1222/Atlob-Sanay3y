@@ -20,8 +20,6 @@ class OtpMail extends Mailable
         $subjects = [
             'email_verification' => 'كود تأكيد البريد الإلكتروني - صنايعي',
             'password_reset'     => 'كود إعادة تعيين كلمة المرور - صنايعي',
-            'phone_verification' => 'كود تأكيد الجوال - صنايعي',
-            'login'              => 'كود تسجيل الدخول - صنايعي',
         ];
 
         return $this->subject($subjects[$this->purpose] ?? 'كود التحقق - صنايعي')

@@ -72,17 +72,13 @@ if ($validator->fails()) {
      */
     public function registerClient(Request $request): JsonResponse
     {
-        // $request->validate([
-        //     'name'                  => 'required|string|max:100',
-        //     'email'                 => 'required|email|unique:users,email',
-        //     'password'              => 'required|string|min:8|confirmed',
-        //     'phone'                 => 'nullable|string|max:20',
-        // ]);
+
         $validate=Validator::make($request->all(), [
             'name'                  => 'required|string|max:100',
             'email'                 => 'required|email|unique:users,email',
             'password'              => 'required|string|min:8|confirmed',
             'phone'                 => 'nullable|string|max:20',
+            'verified_token'        => 'required|string',
         ]);
         if($validate->fails()){
             return response()->json([
@@ -90,16 +86,36 @@ if ($validator->fails()) {
                 'errors' => $validate->errors()
             ], 422);
         }
+ $verifiedEmail = Cache::get(
+        "email_verification:{$request->verified_token}"
+    );
 
-        $user = User::create([
-            'name'              => $request->name,
-            'email'             => $request->email,
-            'password'          => Hash::make($request->password),
-            'role'              => 'client',
-            'phone'             => $request->phone,
-            'email_verified_at' => now(),
-            'is_active'         => true,
-        ]);
+
+    if (!$verifiedEmail) {
+        return response()->json([
+            'message' => 'يجب تأكيد البريد الإلكتروني أولاً'
+        ], 422);
+    }
+
+
+    if ($verifiedEmail !== $request->email) {
+        return response()->json([
+            'message' => 'البريد الإلكتروني غير مطابق'
+        ], 422);
+    }
+
+$user = User::create([
+    'name'              => $request->name,
+    'email'             => $request->email,
+    'password'          => Hash::make($request->password),
+    'role'              => 'client',
+    'phone'             => $request->phone,
+    'email_verified_at' => null,
+    'is_active'         => true,
+]);
+Cache::forget(
+        "email_verification:{$request->verified_token}"
+    );
 
 
         return response()->json([
@@ -112,85 +128,148 @@ if ($validator->fails()) {
      * تسجيل حرفي جديد - يذهب إلى قائمة انتظار موافقة الأدمن
      * لا يتم إنشاء حساب User حتى يوافق الأدمن
      */
-  public function registerCraftsman(Request $request): JsonResponse
+ public function registerCraftsman(Request $request): JsonResponse
 {
-    $validator=Validator::make($request->all(), [
+    $validator = Validator::make($request->all(), [
+
         'first_name' => 'required|string|max:50',
         'last_name'  => 'required|string|max:50',
-        'email'      => 'required|email|unique:craftsmen,email|unique:users,email',
-        'phone'      => 'required|string|max:20',
-        'city'       => 'required|string|max:100',
-        'password'   => 'required|string|min:8|confirmed',
+
+        'email' => 'required|email|
+                    unique:craftsmen,email|
+                    unique:users,email',
+
+        'phone' => 'required|string|max:20',
+
+        'city' => 'required|string|max:100',
+
+        'password' => 'required|string|min:8|confirmed',
+
         'national_id_front' => 'required|file|mimes:jpg,jpeg,png|max:5120',
+
         'national_id_back'  => 'required|file|mimes:jpg,jpeg,png|max:5120',
-        'craft_ids'  => 'required|array|min:1',
+
+        'craft_ids' => 'required|array|min:1',
+
         'craft_ids.*'=> 'exists:crafts,id',
-      //  'verified_token' => 'required|string',
-      'district' => 'nullable|string',
-'latitude' => 'nullable|numeric',
-'longitude' => 'nullable|numeric',
+
+//        'verified_token'=>'required|string',
+
+        'district'=>'nullable|string',
+
+        'latitude'=>'nullable|numeric',
+
+        'longitude'=>'nullable|numeric',
+
     ]);
 
-//     if($validator->fails()){
-//         return response()->json([
-//             'message' => 'فشل التحقق من البيانات',
-//             'errors' => $validator->errors()
-//         ], 422);
-//     }
 
-//     $verifiedEmail = Cache::get(
-//     "craftsman_registration:{$request->verified_token}"
-// );
+    if($validator->fails()){
 
-// if (!$verifiedEmail) {
-//     return response()->json([
-//         'message' => 'Email verification expired'
-//     ], 422);
-// }
+        return response()->json([
+            'message'=>'فشل التحقق من البيانات',
+            'errors'=>$validator->errors()
+        ],422);
 
-// if ($verifiedEmail !== $request->email) {
-//     return response()->json([
-//         'message' => 'Email verification mismatch'
-//     ], 422);
-// }
+    }
 
-    $frontPath = $request->file('national_id_front')->store('national_ids', 'public');
-    $backPath  = $request->file('national_id_back')->store('national_ids', 'public');
+
+
+    // التحقق من OTP للإيميل
+
+    // $verifiedEmail = Cache::get(
+    //     "email_verification:{$request->verified_token}"
+    // );
+
+
+    // if(!$verifiedEmail){
+
+    //     return response()->json([
+    //         'message'=>'يجب تأكيد البريد الإلكتروني أولاً'
+    //     ],422);
+
+    // }
+
+
+    // if($verifiedEmail !== $request->email){
+
+    //     return response()->json([
+    //         'message'=>'البريد الإلكتروني غير مطابق'
+    //     ],422);
+
+    // }
+
+
+
+    $frontPath = $request->file('national_id_front')
+        ->store('national_ids','public');
+
+
+    $backPath = $request->file('national_id_back')
+        ->store('national_ids','public');
+
 
 
     $craftsman = Craftsman::create([
-        'user_id' => null,
-        'first_name' => $request->first_name,
-        'last_name'  => $request->last_name,
-        'email'      => $request->email,
-        'phone'      => $request->phone,
-        'password'   => Hash::make($request->password),
-        'national_id_front' => $frontPath,
-        'national_id_back'  => $backPath,
-        'city' => $request->city,
-        'status' => 'pending',
+
+        'user_id'=>null,
+
+        'first_name'=>$request->first_name,
+
+        'last_name'=>$request->last_name,
+
+        'email'=>$request->email,
+
+        'phone'=>$request->phone,
+
+        'password'=>Hash::make($request->password),
+
+        'national_id_front'=>$frontPath,
+
+        'national_id_back'=>$backPath,
+
+        'city'=>$request->city,
+
+        'status'=>'pending',
+
     ]);
 
 
-    foreach ($request->craft_ids as $index => $craftId) {
+
+    foreach($request->craft_ids as $index=>$craftId){
+
         DB::table('craftsman_crafts')->insert([
-            'craftsman_id' => $craftsman->id,
-            'craft_id' => $craftId,
-            'is_primary' => $index === 0,
-            'created_at' => now(),
-            'updated_at' => now(),
+
+            'craftsman_id'=>$craftsman->id,
+
+            'craft_id'=>$craftId,
+
+            'is_primary'=>$index===0,
+
+            'created_at'=>now(),
+
+            'updated_at'=>now(),
+
         ]);
+
     }
 
-    Cache::forget(
-        "craftsman_registration:{$request->verified_token}"
-    );
+
+
+   // Cache::forget(
+    //     "email_verification:{$request->verified_token}"
+    // );
+
 
 
     return response()->json([
-        'message' => 'تم إرسال الطلب بنجاح',
-        'status' => 'pending'
+
+        'message'=>'تم إرسال الطلب بنجاح',
+
+        'status'=>'pending'
+
     ]);
+
 }
 
     /**

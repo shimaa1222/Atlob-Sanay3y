@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('national_id_front'); // مسار صورة الوجه الأمامي للهوية
             $table->string('national_id_back');  // مسار صورة الوجه الخلفي للهوية
             $table->string('profile_photo')->nullable();
-            $table->string('country')->default('المملكة العربية السعودية');
+            $table->string('country')->default('مصر');
             $table->string('city');
             $table->string('district')->nullable(); // الحي / الحي
             $table->string('full_address')->nullable();

@@ -17,6 +17,7 @@ use App\Notifications\NewCraftsmanRegistrationNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
+
 class AuthController extends Controller
 {
     /**
@@ -119,35 +120,39 @@ if ($validator->fails()) {
         'email'      => 'required|email|unique:craftsmen,email|unique:users,email',
         'phone'      => 'required|string|max:20',
         'city'       => 'required|string|max:100',
+        'password'   => 'required|string|min:8|confirmed',
         'national_id_front' => 'required|file|mimes:jpg,jpeg,png|max:5120',
         'national_id_back'  => 'required|file|mimes:jpg,jpeg,png|max:5120',
         'craft_ids'  => 'required|array|min:1',
         'craft_ids.*'=> 'exists:crafts,id',
-        'verified_token' => 'required|string'
+      //  'verified_token' => 'required|string',
+      'district' => 'nullable|string',
+'latitude' => 'nullable|numeric',
+'longitude' => 'nullable|numeric',
     ]);
-    $verifiedEmail = Cache::get(
-    "craftsman_registration:{$request->verified_token}"
-);
 
-if (!$verifiedEmail) {
-    return response()->json([
-        'message' => 'Email verification expired'
-    ], 422);
-}
+//     if($validator->fails()){
+//         return response()->json([
+//             'message' => 'فشل التحقق من البيانات',
+//             'errors' => $validator->errors()
+//         ], 422);
+//     }
 
-if ($verifiedEmail !== $request->email) {
-    return response()->json([
-        'message' => 'Email verification mismatch'
-    ], 422);
-}
+//     $verifiedEmail = Cache::get(
+//     "craftsman_registration:{$request->verified_token}"
+// );
 
-    if($validator->fails()){
-        return response()->json([
-            'message' => 'فشل التحقق من البيانات',
-            'errors' => $validator->errors()
-        ], 422);
-    }
+// if (!$verifiedEmail) {
+//     return response()->json([
+//         'message' => 'Email verification expired'
+//     ], 422);
+// }
 
+// if ($verifiedEmail !== $request->email) {
+//     return response()->json([
+//         'message' => 'Email verification mismatch'
+//     ], 422);
+// }
 
     $frontPath = $request->file('national_id_front')->store('national_ids', 'public');
     $backPath  = $request->file('national_id_back')->store('national_ids', 'public');
@@ -159,6 +164,7 @@ if ($verifiedEmail !== $request->email) {
         'last_name'  => $request->last_name,
         'email'      => $request->email,
         'phone'      => $request->phone,
+        'password'   => Hash::make($request->password),
         'national_id_front' => $frontPath,
         'national_id_back'  => $backPath,
         'city' => $request->city,
@@ -176,9 +182,9 @@ if ($verifiedEmail !== $request->email) {
         ]);
     }
 
-Cache::forget(
-    "craftsman_registration:{$request->verified_token}"
-);
+    Cache::forget(
+        "craftsman_registration:{$request->verified_token}"
+    );
 
 
     return response()->json([
@@ -186,6 +192,7 @@ Cache::forget(
         'status' => 'pending'
     ]);
 }
+
     /**
      * تسجيل الخروج
      */

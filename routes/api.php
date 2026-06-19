@@ -311,7 +311,7 @@ Route::middleware('auth:sanctum')->group(function () {
  Route::middleware(["auth:sanctum","role:client,admin"])->prefix('client')->group(function () {
 /////////////////////////////////////////////her//////////////////////////////////////
         // الحجوزات
-        Route::get('/bookings', [BookingController::class, 'clientBookings']);//finish
+        Route::get('/bookings', [BookingController::class, 'clientBookings']);//finish 
         Route::post('/bookings.store', [BookingController::class, 'store']);//finish
         Route::get('/bookings.show/{id}', [BookingController::class, 'show']);//finish
         Route::delete('/bookings.cancel/{id}', [BookingController::class, 'cancel']);//finish

@@ -7,6 +7,7 @@ use App\Models\Craftsman;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class AdminCraftsmenController extends Controller
 {
@@ -53,7 +54,7 @@ class AdminCraftsmenController extends Controller
      * POST /admin/craftsmen/{id}/approve
      * نفس منطق AdminController::approveCraftsman تماماً (نفس الباسوورد الافتراضي)
      */
-    public function approve(Request $request, int $id)
+    public function approve(Request $request,int $id)
     {
         $craftsman = Craftsman::findOrFail($id);
 
@@ -65,16 +66,17 @@ class AdminCraftsmenController extends Controller
             return back()->with('error', 'يوجد مستخدم مسجل بنفس الإيميل مسبقاً');
         }
 
-        $password = 'craftsman123';
-
-        $user = User::create([
-            'name'      => $craftsman->first_name . ' ' . $craftsman->last_name,
-            'email'     => $craftsman->email,
-            'password'  => Hash::make($password),
-            'role'      => 'craftsman',
-            'phone'     => $craftsman->phone,
-            'is_active' => true,
-        ]);
+       // $password = ;
+$craftsman = Craftsman::findOrFail($id);
+      $user = User::create([
+    'name'      => $craftsman->first_name . ' ' . $craftsman->last_name,
+    'email'     => $craftsman->email,
+    'password'  => $craftsman->password,
+    'role'      => 'craftsman',
+    'phone'     => $craftsman->phone,
+    'is_active' => true,
+    'email_verified_at' => now(),
+]);
 
         $craftsman->update([
             'user_id'     => $user->id,

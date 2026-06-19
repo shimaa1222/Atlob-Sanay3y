@@ -18,6 +18,7 @@ class Craftsman extends Model
         'last_name',
         'email',
         'phone',
+        'password',
         'national_id_front',
         'national_id_back',
         'profile_photo',
@@ -35,6 +36,15 @@ class Craftsman extends Model
         'approved_by',
         'is_featured',
         'is_available',
+        'district',
+         'latitude',
+         'longitude',
+    ];
+
+    // مهم: لازم نخفي الباسورد المُشفّرة من أي استجابة JSON
+    // عشان مش هتظهر في حاجة زي ملف الحرفي الشخصي أو لوحة الأدمن
+    protected $hidden = [
+        'password',
     ];
 
     protected $casts = [
@@ -161,34 +171,43 @@ class Craftsman extends Model
 
     /**
      * يتم استدعاؤها عند موافقة الأدمن على الحرفي
-     * تقوم بإنشاء حساب User وإرسال بيانات الدخول بالإيميل
+     * تقوم بإنشاء حساب User وإرسال إشعار بالموافقة بالإيميل
+     * تستخدم نفس كلمة المرور اللي اختارها الحرفي وقت التسجيل
+     *
+     * ملاحظة مهمة: موديل User فيه cast 'password' => 'hashed'، يعني لو استخدمنا
+     * User::create() هتتشفّر الباسورد تاني فوق التشفير الأصلي (تشفير مزدوج)
+     * وده هيكسر تسجيل الدخول بعدين. عشان كذا بنستخدم DB::table()->insert()
+     * مباشرة هنا، لأن الباسورد المخزّنة في جدول craftsmen أصلاً متشفّرة بالفعل.
      */
     public function approve(int $adminId): bool
     {
-        // إنشاء حساب المستخدم للحرفي
-        $password = \Illuminate\Support\Str::random(10);
+        // الباسورد محفوظة بالفعل مُشفّرة (hashed) من وقت التسجيل
+        // لو لأي سبب كانت غير موجودة (بيانات قديمة قبل هذا التعديل)، نولّد باسورد عشوائية كحل بديل
+        $hashedPassword = $this->password ?: bcrypt(\Illuminate\Support\Str::random(10));
 
-        $user = User::create([
-            'name'     => $this->full_name,
-            'email'    => $this->email,
-            'password' => bcrypt($password),
-            'role'     => 'craftsman',
-            'phone'    => $this->phone,
-            'is_active' => true,
+        $userId = \Illuminate\Support\Facades\DB::table('users')->insertGetId([
+            'name'       => $this->full_name,
+            'email'      => $this->email,
+            'password'   => $hashedPassword,
+            'role'       => 'craftsman',
+            'phone'      => $this->phone,
+            'is_active'  => true,
+            'email_verified_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         // تحديث بيانات الحرفي
         $this->update([
-            'user_id'     => $user->id,
+            'user_id'     => $userId,
             'status'      => 'approved',
             'approved_at' => now(),
             'approved_by' => $adminId,
         ]);
 
-        // إرسال بيانات الدخول بالإيميل
-        \Illuminate\Support\Facades\Mail::to($this->email)
-            ->send(new \App\Mail\CraftsmanApprovedMail($this, $password));
-
+        // إرسال إشعار الموافقة بالإيميل (بدون كلمة المرور، لأنه هو اللي اختارها بنفسه)
+       Mail::to($this->email)
+          ->send(new CraftsmanApprovedMail($this));
         return true;
     }
 

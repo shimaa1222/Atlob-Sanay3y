@@ -1,7 +1,7 @@
 <?php
 
 namespace Database\Factories;
-
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -40,6 +40,7 @@ class CraftsmanFactory extends Factory
             'approved_by'      => null,
             'is_featured'      => false,
             'is_available'     => true,
+            'password' => Hash::make('password123'),
         ];
     }
 

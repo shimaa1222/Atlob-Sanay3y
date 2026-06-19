@@ -17,13 +17,13 @@ class CraftsmanApprovedMail extends Mailable
     /**
      * Create a new message instance.
      */
-  public $craftsman;
-    public $password;
+    public $craftsman;
 
-    public function __construct(Craftsman $craftsman, $password)
+    // ملاحظة: شلنا $password من هنا، لأن الحرفي اختار كلمة مروره بنفسه وقت التسجيل
+    // فمش محتاجين نبعتها له تاني بالإيميل (وده أسلم من ناحية الأمان كمان)
+    public function __construct(Craftsman $craftsman)
     {
         $this->craftsman = $craftsman;
-        $this->password = $password;
     }
 
 public function envelope(): Envelope

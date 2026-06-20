@@ -2,53 +2,31 @@
 
 namespace App\Notifications;
 
+use App\Models\Booking;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class NewBookingNotification extends Notification
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
+    public function __construct(public Booking $booking) {}
+
+    public function via($notifiable): array
     {
-        //
+        return ['database'];
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
-    {
-        return ['mail'];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
+    public function toArray($notifiable): array
     {
         return [
-            //
+            'type'           => 'new_booking',
+            'booking_id'     => $this->booking->id,
+            'booking_number' => $this->booking->booking_number,
+            'client_name'    => $this->booking->client->name,
+            'service_title'  => $this->booking->service_title,
+            'booking_date'   => $this->booking->booking_date->format('Y-m-d'),
+            'message'        => 'حجز جديد من ' . $this->booking->client->name,
         ];
     }
 }

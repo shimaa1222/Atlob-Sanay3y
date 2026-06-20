@@ -8,6 +8,7 @@ use App\Models\ServicePost;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Notifications\NewServicePostNotification;
 
 class ServicePostController extends Controller
 {

@@ -59,7 +59,8 @@ class NotificationController extends Controller
 
         $formatted = $notifications->getCollection()->map(fn($n) => [
             'id'         => $n->id,
-            'type'       => class_basename($n->type),
+            // 'type'       => class_basename($n->type),
+            'type' => $n->data['type'] ?? class_basename($n->type),
             'data'       => $n->data,
             'is_read'    => !is_null($n->read_at),
             'created_at' => $n->created_at->diffForHumans(),

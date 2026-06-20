@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Models\PostResponse;
+use App\Models\ServicePost;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -9,28 +11,27 @@ class NewPostResponseNotification extends Notification
 {
     use Queueable;
 
-    protected $post;
-    protected $response;
+    public function __construct(
+        public ServicePost  $post,
+        public PostResponse $response
+    ) {}
 
-    public function __construct($post, $response)
-    {
-        $this->post = $post;
-        $this->response = $response;
-    }
-
-    public function via(object $notifiable): array
+    public function via($notifiable): array
     {
         return ['database'];
     }
 
-    public function toArray(object $notifiable): array
+    public function toArray($notifiable): array
     {
         return [
-            'post_id' => $this->post->id,
-            'response_id' => $this->response->id,
-            'message' => 'تم إضافة رد جديد على منشورك',
-            'craftsman_id' => $this->response->craftsman_id,
-            'offered_price' => $this->response->offered_price,
+            'type'           => 'new_post_response',
+            'post_id'        => $this->post->id,
+            'post_title'     => $this->post->title,
+            'response_id'    => $this->response->id,
+            'craftsman_name' => $this->response->craftsman->full_name,
+            'offered_price'  => $this->response->offered_price,
+            'message'        => 'رد جديد على طلبك: ' . $this->post->title
+                                . ' من ' . $this->response->craftsman->full_name,
         ];
     }
 }

@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\Notification\NotificationController;
 // AUTH ROUTES - مسارات المصادقة
 // ============================================================
 
+
 Route::middleware('auth:sanctum')->group(function () {
 
 // ─── UPLOAD ────────────────────────────────────────────────
@@ -69,7 +70,7 @@ Route::prefix('auth')->group(function () {
     // Route::post('/admin/login', [AdminController::class, 'login']);
 
 ////////////////////Not yet test///////////////////////////
-
+Route::get('/reviews', [CraftsmanController::class, 'reviewsList']);
 
 
 // OTP عام (بدون token)

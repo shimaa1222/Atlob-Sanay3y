@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\CraftsmanResource;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Review;
 class CraftsmanController extends Controller
 {
     /**
@@ -210,5 +211,14 @@ if ($validator->fails()) {
             'message'   => 'تم تحديث الملف الشخصي بنجاح',
             'craftsman' => $craftsman->fresh(['crafts', 'skills']),
         ]);
+    }
+
+    public function reviewsList(Request $request): JsonResponse
+    {
+        $reviews = Review::with(['client:id,name', 'craftsman:id,first_name,last_name'])
+            ->latest()
+            ->paginate(20);
+
+        return response()->json(['reviews' => $reviews]);
     }
 }

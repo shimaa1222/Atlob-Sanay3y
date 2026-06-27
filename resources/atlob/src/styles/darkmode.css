@@ -1,0 +1,38 @@
+body.dark-mode {
+  --color-surface: var(--dark-surface);
+  --color-background: var(--dark-background);
+  --color-border: var(--dark-border);
+  --color-text-primary: var(--dark-text-primary);
+  --color-text-secondary: var(--dark-text-secondary);
+  background: var(--dark-background);
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode header,
+body.dark-mode nav {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: var(--dark-border);
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background: var(--dark-surface);
+  color: var(--dark-text-primary);
+  border-color: var(--dark-border);
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: var(--dark-text-secondary);
+}
+
+body.dark-mode .card,
+body.dark-mode [class*="card"] {
+  background: var(--dark-surface);
+  border-color: var(--dark-border);
+}
+
+body.dark-mode footer {
+  background: #0c1222;
+}

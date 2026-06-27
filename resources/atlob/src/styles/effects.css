@@ -1,0 +1,120 @@
+/* تأثير ظهور سلس */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* تأثيرات hover */
+.hover-lift {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hover-scale {
+  transition: transform var(--transition-base);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* تأثيرات الأزرار */
+.btn-effect {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.btn-effect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-effect:hover::after {
+  opacity: 1;
+}
+
+.btn-effect:active {
+  transform: scale(0.98);
+}
+
+/* تأثير Shimmer للتحميل */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-lg);
+}
+
+/* تأثير خط تحت الرابط */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transition: transform var(--transition-base);
+  border-radius: 1px;
+}
+
+.link-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* تأثير توهج للبطاقات */
+.glow-on-hover {
+  transition: box-shadow var(--transition-base);
+}
+
+.glow-on-hover:hover {
+  box-shadow: 0 0 0 3px var(--primary-light), var(--shadow-md);
+}
+
+/* تأثير دخول متدرج */
+.stagger-1 { animation: fadeInUp 0.5s ease forwards; opacity: 0; }
+.stagger-2 { animation: fadeInUp 0.5s ease 0.1s forwards; opacity: 0; }
+.stagger-3 { animation: fadeInUp 0.5s ease 0.2s forwards; opacity: 0; }
+.stagger-4 { animation: fadeInUp 0.5s ease 0.3s forwards; opacity: 0; }
+.stagger-5 { animation: fadeInUp 0.5s ease 0.4s forwards; opacity: 0; }
+.stagger-6 { animation: fadeInUp 0.5s ease 0.5s forwards; opacity: 0; }

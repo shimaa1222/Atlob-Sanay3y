@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\API\Auth\AuthController;
-use App\Http\Controllers\API\Booking\BookingController;
-use App\Http\Controllers\API\Craftsman\CraftsmanController;
-use App\Http\Controllers\API\ServicePost\ServicePostController;
+use App\Http\Controllers\APi\Auth\AuthController;
+use App\Http\Controllers\APi\Booking\BookingController;
+use App\Http\Controllers\APi\Craftsman\CraftsmanController;
+use App\Http\Controllers\APi\ServicePost\ServicePostController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use Illuminate\Support\Facades\Route;

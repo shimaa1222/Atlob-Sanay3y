@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\API\ServicePost;
-
+use App\Notifications\OfferAcceptedNotification;
 use App\Http\Controllers\Controller;
 use App\Models\PostResponse;
 use App\Models\ServicePost;
@@ -238,26 +238,105 @@ class ServicePostController extends Controller
      * قبول أو رفض رد حرفي (العميل)
      * PATCH /api/service-posts/{postId}/responses/{responseId}
      */
-    public function updateResponse(Request $request, int $postId, int $responseId): JsonResponse
-    {
-        $request->validate(['status' => 'required|in:accepted,rejected']);
-        $post = ServicePost::where('client_id', $request->user()->id)->findOrFail($postId);
+//     public function updateResponse(Request $request, int $postId, int $responseId): JsonResponse
+//     {
+//         $request->validate(['status' => 'required|in:accepted,rejected']);
+//         $post = ServicePost::where('client_id', $request->user()->id)->findOrFail($postId);
 
 
-        $response = PostResponse::where('post_id', $post->id)->findOrFail($responseId);
-        $response->update(['status' => $request->status]);
+//         $response = PostResponse::where('post_id', $post->id)->findOrFail($responseId);
+//         $response->update(['status' => $request->status]);
+//         $craftsmanUser = $response->craftsman->user;
 
-        // إذا قبل العميل الرد، نغلق المنشور
-        if ($request->status === 'accepted') {
-            $post->update(['status' => 'closed']);
-        }
+// $craftsmanUser->notify(
+//     new OfferAcceptedNotification($post, $response)
+// );
 
+//         // إذا قبل العميل الرد، نغلق المنشور
+//         if ($request->status === 'accepted') {
+//             $post->update(['status' => 'closed']);
+//         }
+
+//         return response()->json([
+//             'message'  => $request->status === 'accepted' ? 'تم قبول عرض الحرفي' : 'تم رفض العرض',
+//             'response' => $response->fresh(),
+//         ]);
+//     }
+
+public function updateResponse(
+    Request $request,
+    int $postId,
+    int $responseId
+): JsonResponse
+{
+    $request->validate([
+        'status' => 'required|in:accepted,rejected'
+    ]);
+
+    $post = ServicePost::where(
+        'client_id',
+        $request->user()->id
+    )->findOrFail($postId);
+
+    // منع التعامل مع منشور مغلق
+    if ($post->status !== 'active') {
         return response()->json([
-            'message'  => $request->status === 'accepted' ? 'تم قبول عرض الحرفي' : 'تم رفض العرض',
-            'response' => $response->fresh(),
-        ]);
+            'message' => 'هذا المنشور مغلق بالفعل'
+        ], 422);
     }
 
+    $response = PostResponse::where(
+        'post_id',
+        $post->id
+    )->findOrFail($responseId);
+
+    DB::transaction(function () use ($request, $post, $response) {
+
+        $response->update([
+            'status' => $request->status
+        ]);
+
+        if ($request->status === 'accepted') {
+
+            // رفض باقي العروض
+            PostResponse::where('post_id', $post->id)
+                ->where('id', '!=', $response->id)
+                ->update([
+                    'status' => 'rejected'
+                ]);
+
+            // إغلاق المنشور
+            $post->update([
+                'status' => 'closed'
+            ]);
+
+            // تحميل العلاقات المطلوبة
+            $post->load('client');
+            $response->load('craftsman.user');
+
+            // إشعار الحرفي المقبول
+            if (
+                $response->craftsman &&
+                $response->craftsman->user
+            ) {
+                $response->craftsman->user->notify(
+                    new OfferAcceptedNotification(
+                        $post,
+                        $response
+                    )
+                );
+            }
+        }
+    });
+
+    return response()->json([
+        'message' => $request->status === 'accepted'
+            ? 'تم قبول عرض الحرفي بنجاح'
+            : 'تم رفض العرض',
+
+        'response' => $response->fresh(),
+    ]);
+}
     /**
      * إغلاق أو حذف منشور (العميل)
      * DELETE /api/service-posts/{id}

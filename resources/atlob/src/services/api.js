@@ -1,5 +1,5 @@
 // src/services/api.js
-const API_URL = "https://sanay3e-production.up.railway.app/api";
+const API_URL = "precious-commitment-production-e011.up.railway.app/api"
 
 // ============================================================
 // ============================================================

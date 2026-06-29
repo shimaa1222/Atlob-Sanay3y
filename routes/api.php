@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\Booking\BookingController; // ✅ Api
-use App\Http\Controllers\Api\Craftsman\CraftsmanController; // ✅ Api
-use App\Http\Controllers\Api\ServicePost\ServicePostController; // ✅ Api
+use App\Http\Controllers\Api\Booking\BookingController;
+use App\Http\Controllers\Api\Craftsman\CraftsmanController;
+use App\Http\Controllers\Api\ServicePost\ServicePostController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use Illuminate\Support\Facades\Route;

@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { 
   Mail, Lock, Eye, EyeOff, User, Wrench, 
-  CheckCircle, LogIn, Moon, Sun, Globe
-} from 'lucide-react';
+  CheckCircle, LogIn, Moon, Sun, Globe, ArrowLeft
+} from 'lucide-react'; // ✅ إضافة ArrowLeft
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -17,7 +17,7 @@ const LoginPage = () => {
   const [lang, setLang] = useState('ar');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('client'); // ✅ client (متوافق مع الباك إند)
+  const [role, setRole] = useState('client');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
@@ -25,6 +25,11 @@ const LoginPage = () => {
   const [successLogin, setSuccessLogin] = useState(false);
 
   const from = location.state?.from?.pathname || '/';
+
+  // ✅ دالة الرجوع للصفحة السابقة
+  const handleGoBack = () => {
+    navigate(-1); // يرجع للصفحة السابقة
+  };
 
   // Language
   useEffect(() => {
@@ -84,6 +89,7 @@ const LoginPage = () => {
     roleNote: lang === 'ar' 
       ? '💡 نوع الحساب يتم تحديده تلقائياً من البيانات المسجلة' 
       : '💡 Account type is automatically determined from registered data',
+    back: lang === 'ar' ? 'رجوع' : 'Back',
   };
 
   // ✅ تسجيل الدخول
@@ -101,7 +107,6 @@ const LoginPage = () => {
     try {
       const result = await login(email, password);
 
-      // ❌ لو فشل تسجيل الدخول
       if (!result.success) {
         setError(result.message || t.invalidCredentials);
         setLoading(false);
@@ -112,7 +117,6 @@ const LoginPage = () => {
       console.log('🔄 [LoginPage] Role from backend:', result.role);
       console.log('🔄 [LoginPage] Selected role in UI:', role);
 
-      // ✅ حفظ بيانات "تذكرني"
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', email);
         localStorage.setItem('rememberedRole', role);
@@ -124,7 +128,6 @@ const LoginPage = () => {
       setSuccessLogin(true);
       setLoading(false);
       
-      // ✅ التحقق من البريد الإلكتروني أولاً
       if (result.needsVerification) {
         setTimeout(() => {
           navigate('/verify-email', { replace: true });
@@ -132,12 +135,10 @@ const LoginPage = () => {
         return;
       }
 
-      // ✅ توجيه حسب الدور (متوافق مع الباك إند)
       setTimeout(() => {
         const userRole = result.role || 'client';
         console.log('🔄 [LoginPage] Navigating with role:', userRole);
         
-        // ✅ استخدام الأدوار الصحيحة من الباك إند
         if (userRole === 'client') {
           navigate('/customer/home', { replace: true });
         } else if (userRole === 'craftsman') {
@@ -145,7 +146,6 @@ const LoginPage = () => {
         } else if (userRole === 'admin') {
           navigate('/admin/dashboard', { replace: true });
         } else {
-          // ✅ العودة إلى الصفحة السابقة إذا كان الدور غير معروف
           navigate(from, { replace: true });
         }
       }, 800);
@@ -158,7 +158,6 @@ const LoginPage = () => {
 
   // ✅ Demo Login
   const handleDemoLogin = async (demoRole) => {
-    // ✅ تحديث الـ role في الـ UI
     setRole(demoRole);
     
     const demoEmail = demoRole === 'client' 
@@ -173,7 +172,6 @@ const LoginPage = () => {
     try {
       const result = await login(demoEmail, '12345678');
       
-      // ❌ لو فشل تسجيل الدخول
       if (!result.success) {
         setError(result.message || 'فشل تسجيل الدخول التجريبي');
         setLoading(false);
@@ -193,7 +191,6 @@ const LoginPage = () => {
         return;
       }
 
-      // ✅ توجيه حسب الدور (متوافق مع الباك إند)
       setTimeout(() => {
         const userRole = result.role || 'client';
         console.log('🔄 [LoginPage] Demo navigating with role:', userRole);
@@ -261,6 +258,14 @@ const LoginPage = () => {
         .input-focus { transition: all 0.3s ease; }
         .input-focus:focus-within { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
         
+        /* ✅ زر الرجوع */
+        .back-btn {
+          transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+          transform: translateX(-4px);
+        }
+        
         @media (max-width: 480px) {
           .login-card { border-radius: 20px !important; }
           .header-section { padding: 30px 20px !important; }
@@ -277,6 +282,31 @@ const LoginPage = () => {
         gap: '8px', 
         zIndex: 10 
       }}>
+        {/* ✅ زر الرجوع */}
+        <button 
+          onClick={handleGoBack} 
+          className="back-btn"
+          style={{
+            padding: '8px 12px', 
+            borderRadius: '10px', 
+            border: `1px solid ${borderColor}`,
+            background: cardBg, 
+            cursor: 'pointer', 
+            color: textColor,
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            gap: '4px',
+            transition: 'all 0.3s ease',
+            fontFamily: "'Cairo', sans-serif",
+            fontSize: '0.8rem',
+            fontWeight: 600,
+          }}
+        >
+          <ArrowLeft size={16} />
+          {t.back}
+        </button>
+        
         <button onClick={toggleLang} style={{
           padding: '8px 14px', borderRadius: '10px', border: `1px solid ${borderColor}`,
           background: cardBg, cursor: 'pointer', color: textColor,
@@ -359,7 +389,7 @@ const LoginPage = () => {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
-            {/* ✅ Role Selection - تفاعلية مع الـ state */}
+            {/* Role Selection */}
             <div className="animate-fade-in-up delay-100">
               <label style={{ display: 'block', fontWeight: '600', color: textColor, marginBottom: '10px', fontSize: '0.85rem' }}>
                 {t.roleLabel}
@@ -400,7 +430,6 @@ const LoginPage = () => {
                   </div>
                 </button>
               </div>
-              {/* ✅ ملاحظة توضيحية */}
               <p style={{ 
                 fontSize: '0.7rem', 
                 color: textSecondary, 

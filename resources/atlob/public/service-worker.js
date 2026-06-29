@@ -1,4 +1,5 @@
-const CACHE_NAME = 'atlob-v2';
+// public/service-worker.js
+const CACHE_NAME = 'atlob-v3'; // ✅ غيرنا الرقم عشان يفرض التحديث
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -7,7 +8,12 @@ self.addEventListener('install', (event) => {
         '/',
         '/index.html',
         '/manifest.json',
-        '/icon.svg'
+        '/favicon.ico',
+        '/favicon-96x96.png',
+        '/web-app-manifest-192x192.png',
+        '/web-app-manifest-512x512.png',
+        '/apple-touch-icon.png',
+        '/site.webmanifest'
       ]);
     })
   );

@@ -1,49 +1,112 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0d6efd">
-  <meta name="description" content="طلب صناعي - منصة ربط العملاء بالحرفيين المهرة في جميع التخصصات">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="طلب صناعي">
-  <link rel="apple-touch-icon" href="/icon.svg">
-
-<link rel="icon" href="https://media.base44.com/images/public/69fe164377b5863c8dd3dec6/fc75a8784_logo.png" type="image/png">
-<meta name="theme-color" content="#1d4ed8">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="صنايعي">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="manifest" href="/manifest.json">  <script type="text/javascript">
-  function googleTranslateElementInit() {
-    new google.translate.TranslateElement({
-      pageLanguage: 'ar',
-      includedLanguages: 'ar,en',
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-    }, 'google_translate_element');
-  }
-</script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-  <title>اطلب صناعي - منصة ربط العملاء بالحرفيين</title>
-  
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <!-- ============================================================
+    THEME COLOR
+    ============================================================ -->
+    <meta name="theme-color" content="#2563eb" />
+    
+    <!-- ============================================================
+    SEO & DESCRIPTION
+    ============================================================ -->
+    <meta name="description" content="اطلب صنايعي - منصة ربط العملاء بالحرفيين المهرة في جميع التخصصات في مصر. سباكين، كهربائيين، نجارين، دهانين، فنيين تكييف." />
+    <meta name="keywords" content="حرفيين, سباك, كهربائي, نجار, صنايعي, خدمات منزلية, مصر, اطلب صنايعي" />
+    <meta name="author" content="اطلب صنايعي" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- ============================================================
+    OPEN GRAPH (Facebook, LinkedIn, etc.)
+    ============================================================ -->
+    <meta property="og:title" content="اطلب صنايعي - منصة ربط العملاء بالحرفيين في مصر" />
+    <meta property="og:description" content="ابحث عن حرفيين موثوقين واحجز خدمات منزلية بسهولة وأمان في جميع محافظات مصر." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://atlob-sanay3y.com" />
+    <meta property="og:image" content="%PUBLIC_URL%/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="ar_AR" />
+    <meta property="og:site_name" content="اطلب صنايعي" />
+    
+    <!-- ============================================================
+    TWITTER CARD
+    ============================================================ -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="اطلب صنايعي - منصة ربط العملاء بالحرفيين" />
+    <meta name="twitter:description" content="ابحث عن حرفيين موثوقين واحجز خدمات منزلية بسهولة وأمان في مصر." />
+    <meta name="twitter:image" content="%PUBLIC_URL%/twitter-card.jpg" />
+    
+    <!-- ============================================================
+    PWA / MOBILE APP
+    ============================================================ -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="صنايعي" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="اطلب صنايعي" />
+    
+    <!-- ============================================================
+    FAVICON & ICONS - باستخدام الملفات الموجودة
+    ============================================================ -->
+    
+    <!-- ✅ Favicon الأساسي (جميع المتصفحات) -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    
+    <!-- ✅ Favicon SVG (للمتصفحات الحديثة) -->
+    <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
+    
+    <!-- ✅ Favicon 96x96 (للمتصفحات القديمة) -->
+    <link rel="icon" type="image/png" sizes="96x96" href="%PUBLIC_URL%/favicon-96x96.png" />
+    
+    <!-- ✅ Apple Touch Icon (iPhone, iPad) -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
+    
+    <!-- ✅ Android Chrome Icons (PWA) -->
+    <link rel="icon" type="image/png" sizes="192x192" href="%PUBLIC_URL%/web-app-manifest-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="%PUBLIC_URL%/web-app-manifest-512x512.png" />
+    
+    <!-- ✅ Microsoft Windows -->
+    <meta name="msapplication-TileColor" content="#2563eb" />
+    <meta name="msapplication-TileImage" content="%PUBLIC_URL%/favicon-96x96.png" />
+    
+    <!-- ✅ Manifest (PWA) -->
+    <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest" />
+    
+    <!-- ============================================================
+    PRELOAD FONTS (لتحسين الأداء)
+    ============================================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <!-- ============================================================
+    TITLE
+    ============================================================ -->
+    <title>اطلب صنايعي | منصة ربط العملاء بالحرفيين في مصر</title>
 </head>
 <body>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js');
-    });
-  }
-</script>
-  <div id="root"></div>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js');
-    });
-  }
-</script>
+    <!-- ============================================================
+    SERVICE WORKER REGISTRATION
+    ============================================================ -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registered successfully');
+                    })
+                    .catch(error => {
+                        console.warn('⚠️ Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+    
+    <!-- ============================================================
+    ROOT ELEMENT
+    ============================================================ -->
+    <div id="root"></div>
 </body>
 </html>

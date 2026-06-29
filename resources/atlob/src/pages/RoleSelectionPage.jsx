@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // ✅ إضافة useNavigate
 import { useTheme } from '../context/ThemeContext';
 import { 
   User, Wrench, Sparkles, Star, Shield, Zap,
   Search, Calendar, MessageCircle, TrendingUp,
   Award, CheckCircle, ArrowRight, ChevronRight,
-  Users, Clock, ThumbsUp, Heart, Globe
+  Users, Clock, ThumbsUp, Heart, Globe, ArrowLeft // ✅ إضافة ArrowLeft
 } from 'lucide-react';
 
-const SelectRolePage = () => {
+const RoleSelectionPage = () => {
   const { darkMode } = useTheme();
+  const navigate = useNavigate(); // ✅ استخدام useNavigate
   const [lang, setLang] = useState('ar');
   const [hoveredCard, setHoveredCard] = useState(null);
+
+  // ✅ دالة الرجوع للصفحة السابقة
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   // Language initialization
   useEffect(() => {
@@ -63,6 +69,7 @@ const SelectRolePage = () => {
     login: lang === 'ar' ? 'تسجيل الدخول' : 'Login',
     trusted: lang === 'ar' ? 'منصة موثوقة' : 'Trusted Platform',
     whyUs: lang === 'ar' ? 'لماذا تختارنا؟' : 'Why Choose Us?',
+    back: lang === 'ar' ? 'رجوع' : 'Back',
     whyFeatures: lang === 'ar' ? [
       { icon: <Shield size={20} />, text: 'حرفيون موثقون ومعتمدون' },
       { icon: <Star size={20} />, text: 'تقييمات حقيقية من عملاء' },
@@ -208,6 +215,18 @@ const SelectRolePage = () => {
         .delay-400 { animation-delay: 0.4s; }
         .delay-500 { animation-delay: 0.5s; }
         
+        /* ✅ زر الرجوع */
+        .back-btn {
+          transition: all 0.3s ease;
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 10;
+        }
+        .back-btn:hover {
+          transform: translateX(-4px);
+        }
+        
         @media (max-width: 768px) {
           .cards-grid {
             grid-template-columns: 1fr !important;
@@ -220,14 +239,56 @@ const SelectRolePage = () => {
           .why-grid {
             grid-template-columns: 1fr 1fr !important;
           }
+          .back-btn {
+            top: 12px;
+            right: 12px;
+            padding: 6px 10px !important;
+            font-size: 0.7rem !important;
+          }
         }
         
         @media (max-width: 480px) {
           .why-grid {
             grid-template-columns: 1fr !important;
           }
+          .back-btn {
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px !important;
+            font-size: 0.65rem !important;
+          }
+          .back-btn svg {
+            width: 14px !important;
+            height: 14px !important;
+          }
         }
       `}</style>
+
+      {/* ✅ زر الرجوع */}
+      <button 
+        onClick={handleGoBack} 
+        className="back-btn"
+        style={{
+          padding: '10px 16px',
+          borderRadius: '12px',
+          border: `1px solid ${borderColor}`,
+          background: cardBg,
+          cursor: 'pointer',
+          color: textColor,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '6px',
+          transition: 'all 0.3s ease',
+          fontFamily: "'Cairo', sans-serif",
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          boxShadow: darkMode ? '0 4px 16px rgba(0,0,0,0.3)' : '0 4px 16px rgba(0,0,0,0.08)',
+        }}
+      >
+        <ArrowLeft size={18} />
+        {t.back}
+      </button>
 
       <div style={{ maxWidth: '1000px', width: '100%', textAlign: 'center' }}>
         
@@ -509,4 +570,4 @@ const SelectRolePage = () => {
   );
 };
 
-export default SelectRolePage;
+export default RoleSelectionPage;

@@ -2,7 +2,6 @@
 const API_URL = "https://sanay3e-production.up.railway.app/api";
 
 // ============================================================
-// ✅ دوال مساعدة
 // ============================================================
 const getHeaders = () => {
   const token = localStorage.getItem("token");

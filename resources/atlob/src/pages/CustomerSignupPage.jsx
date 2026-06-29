@@ -22,6 +22,7 @@ import {
   Lock,
   Sparkles,
   Phone,
+  ArrowLeft, // ✅ إضافة
 } from "lucide-react";
 
 const egyptianCities = [
@@ -46,7 +47,7 @@ const CustomerSignupPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ✅ OTP State
-  const [step, setStep] = useState('otp'); // 'otp' | 'verify' | 'register'
+  const [step, setStep] = useState('otp');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [verifiedToken, setVerifiedToken] = useState('');
@@ -54,7 +55,6 @@ const CustomerSignupPage = () => {
   const [otpError, setOtpError] = useState('');
   const [otpSuccess, setOtpSuccess] = useState('');
 
-  // ✅ شيلنا email من formData
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -68,6 +68,11 @@ const CustomerSignupPage = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // ✅ دالة الرجوع للصفحة السابقة
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   // Language initialization
   useEffect(() => {
@@ -115,7 +120,7 @@ const CustomerSignupPage = () => {
     login: lang === 'ar' ? 'تسجيل الدخول' : 'Login',
     required: lang === 'ar' ? 'مطلوب' : 'Required',
     invalidEmail: lang === 'ar' ? 'بريد إلكتروني غير صالح' : 'Invalid email',
-    passwordMin: lang === 'ar' ? '8 أحرف على الأقل' : 'Min 8 characters',  // ✅ 8 بدلاً من 6
+    passwordMin: lang === 'ar' ? '8 أحرف على الأقل' : 'Min 8 characters',
     passwordMismatch: lang === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match',
     creating: lang === 'ar' ? 'جاري إنشاء الحساب...' : 'Creating account...',
     redirecting: lang === 'ar' ? 'جاري التوجيه...' : 'Redirecting...',
@@ -134,6 +139,7 @@ const CustomerSignupPage = () => {
     otpBack: lang === 'ar' ? 'رجوع' : 'Back',
     otpError: lang === 'ar' ? 'كود غير صحيح أو منتهي الصلاحية' : 'Invalid or expired code',
     otpSuccess: lang === 'ar' ? 'تم التحقق بنجاح! أكمل بياناتك' : 'Verified successfully! Complete your details',
+    backButton: lang === 'ar' ? 'رجوع' : 'Back', // ✅ إضافة
   };
 
   const handleChange = (e) => {
@@ -252,7 +258,7 @@ const CustomerSignupPage = () => {
     setOtp('');
   };
 
-  // ✅ التحقق من صحة البيانات (باستخدام email من OTP)
+  // ✅ التحقق من صحة البيانات
   const validateForm = () => {
     const newErrors = {};
 
@@ -262,7 +268,6 @@ const CustomerSignupPage = () => {
     if (!formData.firstName.trim()) newErrors.firstName = t.required;
     if (!formData.lastName.trim()) newErrors.lastName = t.required;
     
-    // ✅ استخدم email من OTP مش formData.email
     if (!email.trim()) {
       newErrors.email = t.required;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
@@ -272,7 +277,6 @@ const CustomerSignupPage = () => {
     if (!formData.phone.trim()) newErrors.phone = t.required;
     if (!formData.city && locationMethod === 'manual') newErrors.city = t.required;
     
-    // ✅ 8 أحرف بدلاً من 6
     if (!formData.password) {
       newErrors.password = t.required;
     } else if (formData.password.length < 8) {
@@ -297,13 +301,11 @@ const CustomerSignupPage = () => {
     setError('');
     setSuccess('');
 
-    // ✅ التحقق من صحة البيانات
     if (!validateForm()) {
       console.log('❌ Validation failed');
       return;
     }
 
-    // ✅ التأكد من وجود verified_token
     if (!verifiedToken) {
       console.log('❌ No verified token found');
       setError(lang === 'ar' ? 'يرجى تأكيد البريد الإلكتروني أولاً' : 'Please verify your email first');
@@ -317,7 +319,7 @@ const CustomerSignupPage = () => {
     try {
       const registerData = {
         name: `${formData.firstName} ${formData.lastName}`,
-        email: email, // ✅ من OTP
+        email: email,
         password: formData.password,
         password_confirmation: formData.confirmPassword,
         phone: formData.phone,
@@ -332,13 +334,9 @@ const CustomerSignupPage = () => {
 
       setSuccess(data.message || 'تم إنشاء الحساب بنجاح');
       
-      // ✅ مسح verified_token بعد الاستخدام
       localStorage.removeItem('verified_token');
-      
-      // ✅ حفظ الإيميل للتأكيد
       localStorage.setItem('pendingVerificationEmail', email);
       
-      // ✅ توجيه إلى صفحة العميل مباشرة
       setTimeout(() => {
         navigate('/customer/home');
       }, 2000);
@@ -675,7 +673,7 @@ const CustomerSignupPage = () => {
     </form>
   );
 
-  // ✅ عرض Register Form (شيلنا حقل الإيميل)
+  // ✅ عرض Register Form
   const renderRegisterStep = () => (
     <>
       {otpSuccess && (
@@ -732,7 +730,7 @@ const CustomerSignupPage = () => {
         </div>
       )}
 
-      {/* ✅ رسالة تأكيد الإيميل بدلاً من الحقل */}
+      {/* ✅ رسالة تأكيد الإيميل */}
       <div className="animate-fade-in-up delay-200" style={{
         background: darkMode ? 'rgba(5,150,105,0.1)' : '#d1fae5',
         padding: '12px 16px',
@@ -1027,7 +1025,7 @@ const CustomerSignupPage = () => {
               value={formData.password}
               onChange={handleChange}
               style={{ ...inputStyle(errors.password), paddingRight: '40px', paddingLeft: '40px' }}
-              placeholder="•••••••• (8 أحرف على الأقل)"  // ✅ 8 أحرف
+              placeholder="•••••••• (8 أحرف على الأقل)"
             />
             <button
               type="button"
@@ -1184,9 +1182,25 @@ const CustomerSignupPage = () => {
         .delay-200 { animation-delay: 0.2s; }
         .delay-300 { animation-delay: 0.3s; }
         
+        /* ✅ زر الرجوع */
+        .back-btn {
+          transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+          transform: translateX(-4px);
+        }
+        
         @media (max-width: 768px) {
           .signup-card {
             padding: 32px 20px !important;
+          }
+          .back-btn {
+            padding: 6px 10px !important;
+            font-size: 0.7rem !important;
+          }
+          .back-btn svg {
+            width: 14px !important;
+            height: 14px !important;
           }
         }
       `}</style>
@@ -1199,7 +1213,40 @@ const CustomerSignupPage = () => {
         maxWidth: '520px',
         boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
         border: `1px solid ${borderColor}`,
+        position: 'relative', // ✅ إضافة
       }}>
+        
+        {/* ✅ زر الرجوع */}
+        <button 
+          onClick={handleGoBack} 
+          className="back-btn"
+          style={{
+            position: 'absolute',
+            top: '16px',
+            [lang === 'ar' ? 'right' : 'left']: '16px',
+            padding: '8px 14px',
+            borderRadius: '10px',
+            border: `1px solid ${borderColor}`,
+            background: cardBg,
+            cursor: 'pointer',
+            color: textColor,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            transition: 'all 0.3s ease',
+            fontFamily: "'Cairo', sans-serif",
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            zIndex: 10,
+            boxShadow: darkMode ? '0 4px 16px rgba(0,0,0,0.3)' : '0 4px 16px rgba(0,0,0,0.08)',
+          }}
+          onMouseEnter={(e) => { e.target.style.transform = 'translateX(-4px)'; }}
+          onMouseLeave={(e) => { e.target.style.transform = 'translateX(0)'; }}
+        >
+          <ArrowLeft size={16} />
+          {t.backButton}
+        </button>
         
         {/* Logo/Icon */}
         <div className="animate-fade-in-up" style={{

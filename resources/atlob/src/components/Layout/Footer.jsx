@@ -1,10 +1,13 @@
+// src/components/Layout/Footer.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext'; // ✅ إضافة
 import { Wrench } from 'lucide-react';
 
 const Footer = () => {
   const { darkMode } = useTheme();
+  const { isAuthenticated } = useAuth(); // ✅ إضافة
   const [lang, setLang] = useState('ar');
 
   // Language initialization & listener
@@ -20,6 +23,11 @@ const Footer = () => {
     window.addEventListener('languagechange', handleLanguageChange);
     return () => window.removeEventListener('languagechange', handleLanguageChange);
   }, []);
+
+  // ✅ إذا كان المستخدم مسجلاً دخول، لا تظهر الفوتر
+  if (isAuthenticated) {
+    return null;
+  }
 
   // Translations
   const t = {
@@ -80,7 +88,6 @@ const Footer = () => {
         }}>
           {/* Logo & Description */}
           <div>
-            {/* اللوجو الجديد بنفس تصميم الهيدر */}
             <div style={{
               display: 'flex',
               alignItems: 'center',

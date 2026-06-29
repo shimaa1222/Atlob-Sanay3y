@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\APi\Auth\AuthController;
-use App\Http\Controllers\APi\Booking\BookingController;
-use App\Http\Controllers\APi\Craftsman\CraftsmanController;
-use App\Http\Controllers\APi\ServicePost\ServicePostController;
+use App\Http\Controllers\Auth\AuthController; // ✅ لاحظي Auth مش a
+use App\Http\Controllers\Api\Booking\BookingController; // ✅ Api
+use App\Http\Controllers\Api\Craftsman\CraftsmanController; // ✅ Api
+use App\Http\Controllers\Api\ServicePost\ServicePostController; // ✅ Api
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use Illuminate\Support\Facades\Route;
@@ -420,5 +420,3 @@ Route::middleware(["auth:sanctum","role:admin"])->prefix('admin')->group(functio
     });
 
  });
-
-
